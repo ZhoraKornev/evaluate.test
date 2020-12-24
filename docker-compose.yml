@@ -23,7 +23,6 @@ services:
         env_file:
             - .env
         volumes:
-            # - ./docker/mariadb/config:/etc/mysql/conf.d:ro
             - ./db/data:/var/lib/mysql
         ports:
           - "${DB_EXPOSE_PORT}:3306"
@@ -59,5 +58,6 @@ services:
             - ./docker/php/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
             - ./docker/php/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
             - ./docker/php/composer/:/root/.composer/
-            - ./projects/:/srv/projects/
+            - ./app/:/app
+            - .:/var/www/html
         logging: *default-logging
