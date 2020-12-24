@@ -1,0 +1,63 @@
+version: '3.4'
+#TODO rewrite to some process
+    #@see https://rtfm.co.ua/linux-php-fpm-docker-stdout-i-stderr-net-logov-prilozheniya/https://rtfm.co.ua/linux-php-fpm-docker-stdout-i-stderr-net-logov-prilozheniya/
+x-logging:
+  &default-logging
+    driver: "json-file"
+    options:
+        max-file: "5"
+        max-size: "20m"
+
+services:
+
+    evaluate_app_mailhog:
+        image: mailhog/mailhog
+        restart: unless-stopped
+        ports:
+          - '${MAILHOG_PORT}:1025'
+        logging: *default-logging
+
+    evaluate_app_db:
+        image: mariadb
+        restart: unless-stopped
+        env_file:
+            - .env
+        volumes:
+            # - ./docker/mariadb/config:/etc/mysql/conf.d:ro
+            - ./db/data:/var/lib/mysql
+        ports:
+          - "${DB_EXPOSE_PORT}:3306"
+        logging: *default-logging
+
+    evaluate_app_nginx:
+        build: ./docker/nginx/build
+        image: nginx
+        restart: unless-stopped
+        volumes:
+            - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+            - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./docker/nginx/config:/etc/nginx/conf.d:ro
+            - ./projects:/srv/projects
+            - ./docker/nginx/acme-challenge:/usr/share/nginx/html:ro
+            # - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+        ports:
+            - "${NGINX_EXPOSE_PORT}:80"
+        logging: *default-logging
+
+    evaluate_app_adminer:
+        image: adminer
+        restart: unless-stopped
+
+    evaluate_app_php:
+        build: ./docker/php/build
+        image: php-8
+        restart: unless-stopped
+        env_file:
+            - .env
+        volumes:
+            - ./docker/php/config/msmtprc:/etc/msmtprc:ro
+            - ./docker/php/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
+            - ./docker/php/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+            - ./docker/php/composer/:/root/.composer/
+            - ./projects/:/srv/projects/
+        logging: *default-logging
