@@ -9,16 +9,17 @@ x-logging:
         max-size: "20m"
 
 services:
-
-    evaluate_app_mailhog:
+    mailhog:
         image: mailhog/mailhog
+        container_name: evaluate_app_mailhog
         restart: unless-stopped
         ports:
           - '${MAILHOG_PORT}:1025'
         logging: *default-logging
 
-    evaluate_app_db:
+    db:
         image: mariadb
+        container_name: evaluate_app_db
         restart: unless-stopped
         env_file:
             - .env
@@ -28,28 +29,31 @@ services:
           - "${DB_EXPOSE_PORT}:3306"
         logging: *default-logging
 
-    evaluate_app_nginx:
+    nginx:
         build: ./docker/nginx/build
         image: nginx
+        container_name: evaluate_app_nginx
         restart: unless-stopped
         volumes:
             - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
             - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
             - ./docker/nginx/config:/etc/nginx/conf.d:ro
-            - ./projects:/srv/projects
+            - ./app:/srv/projects
             - ./docker/nginx/acme-challenge:/usr/share/nginx/html:ro
-            # - ./docker/nginx/ssl:/etc/nginx/ssl:ro
         ports:
             - "${NGINX_EXPOSE_PORT}:80"
+            - "${NGINX_ADMINER_EXPOSE_PORT}:8080"
         logging: *default-logging
 
-    evaluate_app_adminer:
+    adminer:
         image: adminer
+        container_name: evaluate_app_adminer
         restart: unless-stopped
 
-    evaluate_app_php:
+    php:
         build: ./docker/php/build
         image: php-8
+        container_name: evaluate_app_php
         restart: unless-stopped
         env_file:
             - .env
@@ -57,7 +61,9 @@ services:
             - ./docker/php/config/msmtprc:/etc/msmtprc:ro
             - ./docker/php/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
             - ./docker/php/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
-            - ./docker/php/composer/:/root/.composer/
-            - ./app/:/app
-            - .:/var/www/html
+            - composer:/root/.composer/cache
+            - ./app/:/var/www/html
         logging: *default-logging
+
+volumes:
+    composer:
