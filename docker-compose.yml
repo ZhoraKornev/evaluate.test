@@ -34,13 +34,16 @@ services:
         image: nginx
         container_name: evaluate_app_nginx
         restart: unless-stopped
+        depends_on:
+            - php
         volumes:
             - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
             - ./docker/nginx/config:/etc/nginx/conf.d:ro
-            - ./app/public:/var/www/html
+            - ./app:/app
         ports:
             - "${NGINX_EXPOSE_PORT}:80"
             - "${NGINX_ADMINER_EXPOSE_PORT}:8080"
+            - "${NGINX_MAILHOG_EXPOSE_PORT}:8025"
         logging: *default-logging
 
     adminer:
@@ -60,7 +63,7 @@ services:
             - ./docker/php/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
             - ./docker/php/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
             - composer:/root/.composer/cache
-            - ./app/:/var/www/html
+            - ./app:/app
         logging: *default-logging
 
 volumes:
