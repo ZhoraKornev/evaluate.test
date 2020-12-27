@@ -42,14 +42,8 @@ services:
             - ./app:/app
         ports:
             - "${NGINX_EXPOSE_PORT}:80"
-            - "${NGINX_ADMINER_EXPOSE_PORT}:8080"
             - "${NGINX_MAILHOG_EXPOSE_PORT}:8025"
         logging: *default-logging
-
-    adminer:
-        image: adminer
-        container_name: evaluate_app_adminer
-        restart: unless-stopped
 
     php:
         build: ./docker/php/build
