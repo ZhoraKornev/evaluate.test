@@ -47,3 +47,6 @@ node_bash:
 
 restart:
 	$(dc) restart
+
+fixtures:
+	$(dc) run --rm $(php) php bin/console doctrine:fixtures:load --no-interaction
