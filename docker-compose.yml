@@ -22,7 +22,7 @@ services:
         container_name: evaluate_app_db
         restart: unless-stopped
         env_file:
-            - .env
+            - ./.env
         volumes:
             - ./db/data:/var/lib/mysql
         ports:
@@ -51,7 +51,7 @@ services:
         container_name: evaluate_app_php
         restart: unless-stopped
         env_file:
-            - .env
+            - ./.env
         volumes:
             - ./docker/php/config/msmtprc:/etc/msmtprc:ro
             - ./docker/php/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
