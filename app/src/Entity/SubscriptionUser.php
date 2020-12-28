@@ -6,6 +6,7 @@ use App\Repository\SubscriptionUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table (name="subscriptions_users")
  * @ORM\Entity(repositoryClass=SubscriptionUserRepository::class)
  */
 class SubscriptionUser

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table (name="subscriptions_types")
  * @ORM\Entity(repositoryClass=SubscriptionTypeRepository::class)
  */
 class SubscriptionType
