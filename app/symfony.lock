@@ -20,6 +20,9 @@
     "firebase/php-jwt": {
         "version": "v5.2.0"
     },
+    "fzaninotto/faker": {
+        "version": "v1.5.0"
+    },
     "nikic/php-parser": {
         "version": "v4.10.4"
     },

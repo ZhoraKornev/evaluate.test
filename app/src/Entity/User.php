@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\Collection;
 /**
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class User implements UserInterface
 {

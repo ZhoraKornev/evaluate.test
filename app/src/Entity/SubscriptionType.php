@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\Id;
 use App\Repository\SubscriptionTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table (name="subscriptions_types")
  * @ORM\Entity(repositoryClass=SubscriptionTypeRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class SubscriptionType
 {
@@ -27,12 +29,12 @@ class SubscriptionType
     private $name;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer",options={"comment":"Present data in coins of current currency"})
      */
     private $price;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer",options={"comment":"Present data in days"})
      */
     private $period;
 
@@ -41,8 +43,20 @@ class SubscriptionType
      */
     private $content;
 
-    public function __construct()
+    /**
+     * SubscriptionType constructor.
+     *
+     * @param Id     $id
+     * @param string $name
+     * @param int    $price
+     * @param int    $period
+     */
+    public function __construct(Id $id, string $name, int $price, int $period)
     {
+        $this->id = $id;
+        $this->name = $name;
+        $this->price = $price;
+        $this->period = $period;
         $this->content = new ArrayCollection();
     }
 

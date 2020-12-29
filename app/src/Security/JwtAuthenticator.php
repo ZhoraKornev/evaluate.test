@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Security;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\JWT;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;

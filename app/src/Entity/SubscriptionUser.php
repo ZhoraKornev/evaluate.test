@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table (name="subscriptions_users")
  * @ORM\Entity(repositoryClass=SubscriptionUserRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class SubscriptionUser
 {

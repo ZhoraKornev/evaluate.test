@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\Id;
 use App\Repository\ContentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table (name="contents")
  * @ORM\Entity(repositoryClass=ContentRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Content
 {
@@ -41,8 +43,18 @@ class Content
      */
     private $subscriptionTypes;
 
-    public function __construct()
+    /**
+     * Content constructor.
+     *
+     * @param Id     $id
+     * @param string $name
+     * @param int    $year
+     */
+    public function __construct(Id $id, string $name, int $year)
     {
+        $this->id = $id;
+        $this->name = $name;
+        $this->year = $year;
         $this->subscriptionTypes = new ArrayCollection();
     }
 
