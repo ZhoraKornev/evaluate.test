@@ -28,20 +28,27 @@ class User implements UserInterface
 
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @var Email|null
+     * @ORM\Column(type="user_user_email", nullable=true)
      */
     private $email;
 
     /**
-     * @ORM\Column(type="json")
+     * @var string|null
+     * @ORM\Column(type="string", name="password_hash")
      */
-    private $roles = [];
+    private $passwordHash;
+    /**
+     * @var string
+     * @ORM\Column(type="string", length=16)
+     */
+    private $status;
 
     /**
-     * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @var Role
+     * @ORM\Column(type="user_user_role", length=16)
      */
-    private $password;
+    private $role;
 
     /**
      * @ORM\OneToMany(targetEntity=SubscriptionUser::class, mappedBy="user")
@@ -64,6 +71,12 @@ class User implements UserInterface
     }
 
     public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+    public function setUserName(string $email): self
     {
         $this->email = $email;
 
