@@ -40,8 +40,11 @@ class SubscriptionsTypesFixture extends CoreFixture
                 $this->faker->numberBetween(10, 99999),
                 $this->faker->randomElement(SubscriptionsTypesFixture::$subscriptionPeriods),
             );
+            $this->addReference(
+                $this->resolveReferenceName(SubscriptionType::class, $i),
+                $entity
+            );
             $manager->persist($entity);
-            $this->addReference($this->resolveReferenceName(SubscriptionType::class, $i), $entity);
         }
         $manager->flush();
     }

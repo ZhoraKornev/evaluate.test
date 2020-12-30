@@ -4,23 +4,13 @@ namespace App\DataFixtures;
 
 use App\Entity\Content;
 use App\Entity\SubscriptionType;
-use App\Entity\User;
 use App\Model\Id;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 
-class ContentFixture extends CoreFixture
+class ContentFixture extends CoreFixture implements DependentFixtureInterface
 {
-    private $encoder;
-
-    public function __construct(UserPasswordEncoderInterface $encoder)
-    {
-        $this->encoder = $encoder;
-    }
-
-    // ...
     public function loadData(ObjectManager $manager)
     {
         $count = 10;
@@ -31,11 +21,8 @@ class ContentFixture extends CoreFixture
                 $this->faker->numberBetween(1880, 2020),
             );
             /** @var SubscriptionType $SubscriptionType */
-            $SubscriptionType = $this->getReference(
-                $this->resolveReferenceName(
-                    SubscriptionType::class,
-                    $this->faker->numberBetween(0, $this->basicQuantityForGenerate)
-                )
+            $SubscriptionType = $this->getRandomReference(
+                SubscriptionType::class
             );
             $entity->addSubscriptionType($SubscriptionType);
             $manager->persist($entity);
@@ -46,7 +33,7 @@ class ContentFixture extends CoreFixture
     public function getDependencies()
     {
         return array(
-            SubscriptionType::class,
+            SubscriptionsTypesFixture::class,
         );
     }
 }
