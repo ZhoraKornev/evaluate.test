@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\Id;
 use App\Repository\SubscriptionUserRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +17,7 @@ class SubscriptionUser
     use ModifyEntityTrait;
 
     /**
+     * @var Id
      * @ORM\Column(type="identifier")
      * @ORM\Id
      */
@@ -41,6 +43,19 @@ class SubscriptionUser
      * @ORM\JoinColumn(nullable=false)
      */
     private User $user;
+    /**
+     * SubscriptionUser constructor.
+     *
+     * @param         $id
+     * @param Content $subscriptionContent
+     * @param User    $user
+     */
+    public function __construct($id, Content $subscriptionContent, User $user) {
+        $this->id = $id;
+        $this->subscriptionContent = $subscriptionContent;
+        $this->user = $user;
+    }
+
 
     public function getActivateAt(): ?DateTimeInterface
     {

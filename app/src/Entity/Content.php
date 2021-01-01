@@ -18,6 +18,7 @@ class Content
     use ModifyEntityTrait;
 
     /**
+     * @var Id
      * @ORM\Column(type="identifier")
      * @ORM\Id
      */

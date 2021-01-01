@@ -28,6 +28,7 @@ class User implements UserInterface
     use ModifyEntityTrait;
 
     /**
+     * @var Id
      * @ORM\Column(type="identifier")
      * @ORM\Id
      */
@@ -60,13 +61,14 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity=SubscriptionUser::class, mappedBy="user")
      * @ORM\JoinColumn(nullable=true)
      */
-    private ArrayCollection $subscriptions;
+    private $subscriptions;
 
     public function __construct(Id $id, Email $email)
     {
         $this->id = $id;
         $this->email = $email;
         $this->status = User::STATUS_WAIT;
+        $this->role = Role::user();
         $this->subscriptions = new ArrayCollection();
     }
     /**
