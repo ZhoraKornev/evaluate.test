@@ -2,31 +2,54 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Content;
-use App\Entity\SubscriptionType;
+use App\Entity\User;
+use App\Exception\ReferenceNotFoundException;
 use App\Model\Id;
+use App\Model\User\Email;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 
-class ContentFixture extends CoreFixture implements DependentFixtureInterface
+class UsersFixture extends CoreFixture implements DependentFixtureInterface
 {
+    /**
+     * @var UserPasswordEncoderInterface
+     */
+    private $encoder;
+
+    /**
+     * UsersFixture constructor.
+     *
+     * @param UserPasswordEncoderInterface $encoder
+     */
+    public function __construct(UserPasswordEncoderInterface $encoder)
+    {
+        $this->encoder = $encoder;
+    }
+    /**
+     * @param ObjectManager $manager
+     *
+     * @throws ReferenceNotFoundException
+     */
     public function loadData(ObjectManager $manager)
     {
-        $count = 10;
+        $output = new ConsoleOutput();
+
+
+        $this->basicQuantityForGenerate = 3;
         for ($i = 0; $i < $this->basicQuantityForGenerate; $i++) {
-            $entity = new Content(
-                Id::next(),
-                $this->faker->name,
-                $this->faker->numberBetween(1880, 2020),
-            );
-            $entity->setDescription($this->faker->realText(300));
-            /** @var SubscriptionType $SubscriptionType */
-            $SubscriptionType = $this->getRandomReference(
-                SubscriptionType::class
-            );
-            $entity->addSubscriptionType($SubscriptionType);
-            $manager->persist($entity);
+            $user = new User(Id::next(),new Email($this->faker->email));
+            $password = $this->faker->password(3,5);
+            $passwordHash = $this->encoder->encodePassword($user, $password);
+            $user->setPassword($passwordHash);
+            if ($this->faker->boolean(80)){
+                $user->setActive();
+                $output->writeln("{$user->getEmail()->getValue()} is active NOW and have password = <info>$password</info>");
+                $output->writeln("You can use this credentials for login");
+            }
+            $manager->persist($user);
         }
         $manager->flush();
     }
@@ -35,6 +58,7 @@ class ContentFixture extends CoreFixture implements DependentFixtureInterface
     {
         return array(
             SubscriptionsTypesFixture::class,
+            ContentFixture::class,
         );
     }
 }

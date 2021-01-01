@@ -3,55 +3,51 @@
 namespace App\Entity;
 
 use App\Repository\SubscriptionUserRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table (name="subscriptions_users")
+ * @ORM\Table (name="subscription_users")
  * @ORM\Entity(repositoryClass=SubscriptionUserRepository::class)
  * @ORM\HasLifecycleCallbacks()
  */
 class SubscriptionUser
 {
     use ModifyEntityTrait;
+
     /**
+     * @ORM\Column(type="identifier")
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @ORM\Column(type="date", nullable=true)
      */
-    private $activateAt;
+    private ?DateTimeInterface $activateAt;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private ?bool $active;
 
     /**
      * @ORM\ManyToOne(targetEntity=Content::class)
      */
-    private $subscriptionContent;
+    private Content $subscriptionContent;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="subscriptions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private User $user;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getActivateAt(): ?\DateTimeInterface
+    public function getActivateAt(): ?DateTimeInterface
     {
         return $this->activateAt;
     }
 
-    public function setActivateAt(?\DateTimeInterface $activateAt): self
+    public function setActivateAt(?DateTimeInterface $activateAt): self
     {
         $this->activateAt = $activateAt;
 
@@ -75,7 +71,7 @@ class SubscriptionUser
         return $this->subscriptionContent;
     }
 
-    public function setSubscriptionContent(?Content $subscriptionContent): self
+    public function setSubscriptionContent(Content $subscriptionContent): self
     {
         $this->subscriptionContent = $subscriptionContent;
 
@@ -87,7 +83,7 @@ class SubscriptionUser
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 

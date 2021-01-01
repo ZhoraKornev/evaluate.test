@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table (name="contents")
+ * @ORM\Table (name="subscription_contents")
  * @ORM\Entity(repositoryClass=ContentRepository::class)
  * @ORM\HasLifecycleCallbacks()
  */
