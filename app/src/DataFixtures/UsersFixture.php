@@ -46,12 +46,20 @@ class UsersFixture extends CoreFixture implements DependentFixtureInterface
             $user->setPassword($passwordHash);
             if ($this->faker->boolean(80)){
                 $user->setActive();
-                $output->writeln("{$user->getEmail()->getValue()} is active NOW and have password = <info>$password</info>");
+                $output->writeln("<info>{$user->getEmail()->getValue()}</info> is active NOW and have password = <info>$password</info>");
                 $output->writeln("You can use this credentials for login");
             }
+            $this->addReference(
+                $this->resolveReferenceName(User::class, $i),
+                $user
+            );
             $manager->persist($user);
         }
         $manager->flush();
+        $users = $manager->getRepository(User::class);
+        if (!$users->count(['status' => User::STATUS_ACTIVE])){
+            $output->writeln("<error>Rerun seeding DB NO active user for test</error>");
+        }
     }
 
     public function getDependencies()

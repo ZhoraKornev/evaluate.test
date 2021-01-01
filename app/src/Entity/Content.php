@@ -22,22 +22,22 @@ class Content
      * @ORM\Column(type="identifier")
      * @ORM\Id
      */
-    private $id;
+    private Id $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private string $name;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $year;
+    private int $year;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $description;
+    private ?string $description;
 
     /**
      * @ORM\ManyToMany(targetEntity=SubscriptionType::class, mappedBy="content")

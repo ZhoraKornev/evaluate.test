@@ -2,20 +2,31 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Content;
-use App\Entity\SubscriptionUser;
+use App\Entity\SubscriptionType;
 use App\Entity\User;
 use App\Exception\ReferenceNotFoundException;
-use App\Model\Id;
-use App\Model\User\Email;
+use App\Service\Factory\UserSubscriptionsManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 
 class SubscriptionsUsersFixture extends CoreFixture implements DependentFixtureInterface
 {
+    /**
+     * @var UserSubscriptionsManager
+     */
+    private UserSubscriptionsManager $subscriptionsManager;
+
+    /**
+     * SubscriptionsUsersFixture constructor.
+     *
+     * @param UserSubscriptionsManager $userSubscriptionsManager
+     */
+    public function __construct(UserSubscriptionsManager $userSubscriptionsManager) {
+        $this->subscriptionsManager =$userSubscriptionsManager;
+    }
+
+
     /**
      * @param ObjectManager $manager
      *
@@ -23,31 +34,19 @@ class SubscriptionsUsersFixture extends CoreFixture implements DependentFixtureI
      */
     public function loadData(ObjectManager $manager)
     {
-        $output = new ConsoleOutput();
-
-
         $this->basicQuantityForGenerate = 3;
         for ($i = 0; $i < $this->basicQuantityForGenerate; $i++) {
-
             /** @var User $user */
             $user = $this->getRandomReference(
                 User::class
             );
-            /** @var Content $user */
-            $content = $this->getRandomReference(
-                Content::class
+            /** @var SubscriptionType $subscriptionType */
+            $subscriptionType = $this->getRandomReference(
+                SubscriptionType::class
             );
-
-            $user = new SubscriptionUser(Id::next(), $content, $user);
-            $password = $this->faker->password(3,5);
-            $passwordHash = $this->encoder->encodePassword($user, $password);
-            $user->setPassword($passwordHash);
-            if ($this->faker->boolean(80)){
-                $user->setActive();
-                $output->writeln("{$user->getEmail()->getValue()} is active NOW and have password = <info>$password</info>");
-                $output->writeln("You can use this credentials for login");
-            }
-            $manager->persist($user);
+            $entity = $this->subscriptionsManager->createForUser($user, $subscriptionType);
+            $entity->activate();
+            $manager->persist($entity);
         }
         $manager->flush();
     }

@@ -17,8 +17,7 @@ class ContentFixture extends CoreFixture implements DependentFixtureInterface
      *
      * @throws ReferenceNotFoundException
      */
-    public function loadData(ObjectManager $manager)
-    {
+    public function loadData(ObjectManager $manager) {
         for ($i = 0; $i < $this->basicQuantityForGenerate; $i++) {
             $entity = new Content(
                 Id::next(),
@@ -31,13 +30,22 @@ class ContentFixture extends CoreFixture implements DependentFixtureInterface
                 SubscriptionType::class
             );
             $entity->addSubscriptionType($SubscriptionType);
+            if ($this->faker->boolean(80)) {
+                $iterationNumber = $this->faker->numberBetween(0, 10);
+                for ($j = 0; $j < $iterationNumber; $j++) {
+                    /** @var SubscriptionType $SubscriptionExtra */
+                    $SubscriptionExtra = $this->getRandomReference(
+                        SubscriptionType::class
+                    );
+                    $entity->addSubscriptionType($SubscriptionExtra);
+                }
+            }
             $manager->persist($entity);
         }
         $manager->flush();
     }
 
-    public function getDependencies()
-    {
+    public function getDependencies() {
         return array(
             SubscriptionsTypesFixture::class,
         );

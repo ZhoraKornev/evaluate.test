@@ -21,7 +21,7 @@ class SubscriptionUser
      * @ORM\Column(type="identifier")
      * @ORM\Id
      */
-    private $id;
+    private Id $id;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -34,26 +34,29 @@ class SubscriptionUser
     private ?bool $active;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Content::class)
-     */
-    private Content $subscriptionContent;
-
-    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="subscriptions")
      * @ORM\JoinColumn(nullable=false)
      */
     private User $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=SubscriptionType::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private SubscriptionType $subscription;
+
     /**
      * SubscriptionUser constructor.
      *
-     * @param         $id
-     * @param Content $subscriptionContent
-     * @param User    $user
+     * @param                  $id
+     * @param SubscriptionType $subscriptionType
+     * @param User             $user
      */
-    public function __construct($id, Content $subscriptionContent, User $user) {
+    public function __construct($id, SubscriptionType $subscriptionType, User $user) {
         $this->id = $id;
-        $this->subscriptionContent = $subscriptionContent;
+        $this->subscription = $subscriptionType;
         $this->user = $user;
+        $this->active = false;
     }
 
 
@@ -81,16 +84,8 @@ class SubscriptionUser
         return $this;
     }
 
-    public function getSubscriptionContent(): ?Content
-    {
-        return $this->subscriptionContent;
-    }
-
-    public function setSubscriptionContent(Content $subscriptionContent): self
-    {
-        $this->subscriptionContent = $subscriptionContent;
-
-        return $this;
+    public function activate() {
+        $this->active = true;
     }
 
     public function getUser(): ?User
@@ -103,5 +98,10 @@ class SubscriptionUser
         $this->user = $user;
 
         return $this;
+    }
+
+    public function getSubscription(): ?SubscriptionType
+    {
+        return $this->subscription;
     }
 }

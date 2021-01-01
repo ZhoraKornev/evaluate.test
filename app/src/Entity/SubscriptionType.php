@@ -22,27 +22,27 @@ class SubscriptionType
      * @ORM\Column(type="identifier")
      * @ORM\Id
      */
-    private $id;
+    private Id $id;
 
     /**
      * @ORM\Column(type="string", length=60)
      */
-    private $name;
+    private string $name;
 
     /**
      * @ORM\Column(type="integer",options={"comment":"Present data in coins of current currency"})
      */
-    private $price;
+    private int $price;
 
     /**
      * @ORM\Column(type="integer",options={"comment":"Present data in days"})
      */
-    private $period;
+    private int $period;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Content::class, inversedBy="subscriptionTypes")
+     * @ORM\ManyToMany(targetEntity=Content::class)
      */
-    private $content;
+    private $contents;
 
     /**
      * SubscriptionType constructor.
@@ -58,7 +58,7 @@ class SubscriptionType
         $this->name = $name;
         $this->price = $price;
         $this->period = $period;
-        $this->content = new ArrayCollection();
+        $this->contents = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -100,15 +100,15 @@ class SubscriptionType
     /**
      * @return Collection|Content[]
      */
-    public function getContent(): Collection
+    public function getContents(): Collection
     {
-        return $this->content;
+        return $this->contents;
     }
 
     public function addContent(Content $content): self
     {
-        if (!$this->content->contains($content)) {
-            $this->content[] = $content;
+        if (!$this->contents->contains($content)) {
+            $this->contents[] = $content;
         }
 
         return $this;
@@ -116,7 +116,7 @@ class SubscriptionType
 
     public function removeContent(Content $content): self
     {
-        $this->content->removeElement($content);
+        $this->contents->removeElement($content);
 
         return $this;
     }
