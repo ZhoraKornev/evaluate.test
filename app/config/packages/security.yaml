@@ -16,11 +16,14 @@ security:
             security: false
         main:
             anonymous: true
+            user_checker: App\Security\UserChecker
             lazy: true
             provider: app_user_provider
             guard:
                 authenticators:
                     - App\Security\LoginUserAuthenticator
+                    - App\Security\JwtAuthenticator
+            entry_point: App\Security\LoginUserAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
