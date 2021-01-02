@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Security;
+
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\JWT;
@@ -16,70 +17,63 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class JwtAuthenticator extends AbstractGuardAuthenticator
 {
+    public const DEFAULT_LIFETIME_JWT = '+50 minutes';
     private $em;
     private $params;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params)
-    {
+    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params) {
         $this->em = $em;
         $this->params = $params;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
+    public function start(Request $request, AuthenticationException $authException = null) {
         $data = [
             'message' => 'Authentication Required'
         ];
+
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
-    public function supports(Request $request)
-    {
+    public function supports(Request $request) {
         return $request->headers->has('Authorization');
     }
 
-    public function getCredentials(Request $request)
-    {
+    public function getCredentials(Request $request) {
         return $request->headers->get('Authorization');
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
-    {
+    public function getUser($credentials, UserProviderInterface $userProvider) {
         try {
-            $credentials = str_replace('Bearer ', '', $credentials);
             $jwt = (array) JWT::decode(
                 $credentials,
                 $this->params->get('jwt_secret'),
                 ['HS256']
             );
+
             return $this->em->getRepository(User::class)
                 ->findOneBy([
-                                'email' => $jwt['user'],
-                            ]);
-        }catch (\Exception $exception) {
+                    'email' => $jwt['user'],
+                ]);
+        } catch (\Exception $exception) {
             throw new AuthenticationException($exception->getMessage());
         }
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
-    {
+    public function checkCredentials($credentials, UserInterface $user) {
 
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
-    {
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {
         return new JsonResponse([
-                                    'message' => $exception->getMessage()
-                                ], Response::HTTP_UNAUTHORIZED);
+            'message' => $exception->getMessage()
+        ], Response::HTTP_UNAUTHORIZED);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
-    {
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey) {
 
     }
 
-    public function supportsRememberMe()
-    {
+    public function supportsRememberMe() {
         return false;
     }
 }
