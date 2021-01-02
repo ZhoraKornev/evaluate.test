@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\DTO\FondyPaymentDTO;
 use App\Repository\SubscriptionTypeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class SubscriptionController extends AbstractController
 {
@@ -22,23 +23,20 @@ class SubscriptionController extends AbstractController
         $this->subscriptions = $subscriptionTypeRepository;
 
     }
-    #[Route('/subscriptions/plan', name: 'subscription_plan',methods: ['GET'])]
-    public function plans(): Response
+    #[Route('/subscriptions/plan', name:'subscription_plan', methods:['GET'])]
+    public function plans():Response
     {
-        $subscriptionPlans = $this->subscriptions->findAll();
-        dd($subscriptionPlans);
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/SubscriptionController.php',
-        ]);
+        return $this->json($this->subscriptions->findAll(), Response::HTTP_OK, [],
+            [AbstractNormalizer::ATTRIBUTES => ['price', 'name', 'period', 'contents' => ['name']]]);
     }
 
-    #[Route('/subscription/pay', name: 'confirm_subscription',methods: ['GET'])]
-    public function pay(Request $request): Response
+    #[Route('/subscription/pay', name:'confirm_subscription', methods:['POST'])]
+    public function pay(
+        FondyPaymentDTO $paymentDTO
+    ):Response
     {
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/SubscriptionController.php',
+            'message' => $paymentDTO->order_id,
         ]);
     }
 }

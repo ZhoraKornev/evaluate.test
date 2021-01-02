@@ -5,7 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\SubscriptionType;
 use App\Entity\User;
 use App\Exception\ReferenceNotFoundException;
-use App\Service\Factory\UserSubscriptionsManager;
+use App\Service\Factory\UserSubscriptionsCreator;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
@@ -13,16 +13,16 @@ use Doctrine\Persistence\ObjectManager;
 class SubscriptionsUsersFixture extends CoreFixture implements DependentFixtureInterface
 {
     /**
-     * @var UserSubscriptionsManager
+     * @var UserSubscriptionsCreator
      */
-    private UserSubscriptionsManager $subscriptionsManager;
+    private UserSubscriptionsCreator $subscriptionsManager;
 
     /**
      * SubscriptionsUsersFixture constructor.
      *
-     * @param UserSubscriptionsManager $userSubscriptionsManager
+     * @param UserSubscriptionsCreator $userSubscriptionsManager
      */
-    public function __construct(UserSubscriptionsManager $userSubscriptionsManager) {
+    public function __construct(UserSubscriptionsCreator $userSubscriptionsManager) {
         $this->subscriptionsManager =$userSubscriptionsManager;
     }
 

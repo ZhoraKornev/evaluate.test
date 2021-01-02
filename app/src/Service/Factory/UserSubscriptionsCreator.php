@@ -9,7 +9,7 @@ use App\Entity\SubscriptionUser;
 use App\Entity\User;
 use App\Model\Id;
 
-class UserSubscriptionsManager
+class UserSubscriptionsCreator
 {
     /**
      * @param User             $user
