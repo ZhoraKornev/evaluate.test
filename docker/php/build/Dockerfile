@@ -1,5 +1,6 @@
 FROM rhamdeew/docker-php-8-fpm-alpine
-#RUN usermod -u 1050 www-data && groupmod -g 1050 www-data
-RUN wget https://getcomposer.org/composer-stable.phar -O /usr/local/bin/composer && chmod +x /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer --quiet
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
 WORKDIR /app

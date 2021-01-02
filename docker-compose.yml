@@ -59,7 +59,10 @@ services:
             - composer:/root/.composer/cache
             - ./app:/app
         logging: *default-logging
+
     rabbitmq:
+        build: ./docker/rabbitmq
+        restart: always
         container_name: evaluate_app_rabbitmq
         image: rabbitmq:management
         hostname: rabbitmq
@@ -69,6 +72,7 @@ services:
 
         volumes:
             - ./rabbitmq:/var/lib/rabbitmq:cached
+        logging: *default-logging
 
 volumes:
     composer:

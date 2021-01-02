@@ -23,6 +23,9 @@
     "fzaninotto/faker": {
         "version": "v1.5.0"
     },
+    "monolog/monolog": {
+        "version": "2.2.0"
+    },
     "nikic/php-parser": {
         "version": "v4.10.4"
     },
@@ -170,6 +173,24 @@
         },
         "files": [
             "config/packages/messenger.yaml"
+        ]
+    },
+    "symfony/monolog-bridge": {
+        "version": "v5.2.1"
+    },
+    "symfony/monolog-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "d7249f7d560f6736115eee1851d02a65826f0a56"
+        },
+        "files": [
+            "config/packages/dev/monolog.yaml",
+            "config/packages/prod/deprecations.yaml",
+            "config/packages/prod/monolog.yaml",
+            "config/packages/test/monolog.yaml"
         ]
     },
     "symfony/orm-pack": {

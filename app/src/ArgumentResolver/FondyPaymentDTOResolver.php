@@ -60,6 +60,7 @@ class FondyPaymentDTOResolver implements ArgumentValueResolverInterface
     {
         // @see https://docs.fondy.eu/en/docs/page/3/#chapter-2
         /** @var FondyPaymentDTO $dto */
+        $this->logger->info('FONDY PAYMENT START');
         $dto = $this->serializer->deserialize($request->getContent(), FondyPaymentDTO::class, 'json');
         if (!$this->signatureVerifications->verify($dto)){
             $this->logger->critical(

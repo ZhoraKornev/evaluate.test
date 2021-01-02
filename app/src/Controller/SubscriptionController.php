@@ -18,6 +18,8 @@ class SubscriptionController extends AbstractController
 
     /**
      * SubscriptionController constructor.
+     *
+     * @param SubscriptionTypeRepository $subscriptionTypeRepository
      */
     public function __construct(SubscriptionTypeRepository $subscriptionTypeRepository) {
         $this->subscriptions = $subscriptionTypeRepository;
