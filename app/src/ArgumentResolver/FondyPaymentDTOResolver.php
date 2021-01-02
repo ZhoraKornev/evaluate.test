@@ -33,12 +33,13 @@ class FondyPaymentDTOResolver implements ArgumentValueResolverInterface
     /**
      * LiqPayPayment constructor.
      *
-     * @param LoggerInterface     $logger
-     * @param SerializerInterface $serializer
+     * @param LoggerInterface            $subscriptionLogger
+     * @param SerializerInterface        $serializer
+     * @param FondySignatureVerification $signatureVerification
      */
-    public function __construct(LoggerInterface $logger,SerializerInterface $serializer,FondySignatureVerification $signatureVerification)
+    public function __construct(LoggerInterface $subscriptionLogger,SerializerInterface $serializer,FondySignatureVerification $signatureVerification)
     {
-        $this->logger = $logger;
+        $this->logger = $subscriptionLogger;
         $this->serializer = $serializer;
         $this->signatureVerifications = $signatureVerification;
     }

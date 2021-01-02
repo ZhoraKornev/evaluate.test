@@ -10,3 +10,11 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
+        subscription_logger:
+            type: rotating_file
+            path: '%kernel.logs_dir%/subscription_logger.log'
+            level: debug
+            channels: [ 'subscription_logger' ]
+            max_files: 10
+    channels:
+        - 'subscription_logger'

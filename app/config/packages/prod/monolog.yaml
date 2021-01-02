@@ -14,3 +14,11 @@ monolog:
             type: console
             process_psr_3_messages: false
             channels: ["!event", "!doctrine"]
+        subscription_logger:
+            type: rotating_file
+            path: '%kernel.logs_dir%/subscription_logger.log'
+            level: debug
+            channels: [ 'subscription_logger' ]
+            max_files: 10
+    channels:
+        - 'subscription_logger'
