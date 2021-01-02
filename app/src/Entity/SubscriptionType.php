@@ -7,10 +7,11 @@ use App\Repository\SubscriptionTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 
 /**
  * @ORM\Table (name="subscription_types")
- * @ORM\Entity(repositoryClass=SubscriptionTypeRepository::class,readOnly=true)
+ * @ORM\Entity(repositoryClass=SubscriptionTypeRepository::class)
  * @ORM\HasLifecycleCallbacks()
  */
 class SubscriptionType
@@ -60,6 +61,15 @@ class SubscriptionType
         $this->period = $period;
         $this->contents = new ArrayCollection();
     }
+
+    /**
+     * @return string
+     */
+    #[Pure] public function getId():string {
+        return $this->id->getValue();
+    }
+
+
 
     public function getName(): ?string
     {

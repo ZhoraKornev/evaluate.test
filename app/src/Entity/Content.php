@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table (name="subscription_contents")
- * @ORM\Entity(repositoryClass=ContentRepository::class,readOnly=true)
+ * @ORM\Entity(repositoryClass=ContentRepository::class)
  * @ORM\HasLifecycleCallbacks()
  */
 class Content

@@ -8,6 +8,7 @@ use App\Entity\SubscriptionType;
 use App\Entity\SubscriptionUser;
 use App\Entity\User;
 use App\Model\Id;
+use DateTime;
 
 class UserSubscriptionsCreator
 {
@@ -18,6 +19,8 @@ class UserSubscriptionsCreator
      * @return SubscriptionUser
      */
     public function createForUser(User $user, SubscriptionType $subscriptionType):SubscriptionUser {
-        return new SubscriptionUser(Id::next(), $subscriptionType, $user);
+        $entity = new SubscriptionUser(Id::next(), $subscriptionType, $user);
+        $entity->setValidDue((new DateTime())->modify("+{$subscriptionType->getPeriod()} days"));
+        return $entity;
     }
 }

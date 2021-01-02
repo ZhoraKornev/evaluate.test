@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Model\Id;
 use App\Repository\SubscriptionUserRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -24,7 +25,7 @@ class SubscriptionUser
     private Id $id;
 
     /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private ?DateTimeInterface $activateAt;
 
@@ -46,6 +47,11 @@ class SubscriptionUser
     private SubscriptionType $subscription;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true,name="valid_due")
+     */
+    private ?DateTimeInterface $validDue;
+
+    /**
      * SubscriptionUser constructor.
      *
      * @param                  $id
@@ -65,13 +71,6 @@ class SubscriptionUser
         return $this->activateAt;
     }
 
-    public function setActivateAt(?DateTimeInterface $activateAt): self
-    {
-        $this->activateAt = $activateAt;
-
-        return $this;
-    }
-
     public function getActive(): ?bool
     {
         return $this->active;
@@ -85,6 +84,7 @@ class SubscriptionUser
     }
 
     public function activate() {
+        $this->activateAt = new DateTime();
         $this->active = true;
     }
 
@@ -103,5 +103,21 @@ class SubscriptionUser
     public function getSubscription(): ?SubscriptionType
     {
         return $this->subscription;
+    }
+
+    public function getValidDue(): ?DateTimeInterface
+    {
+        return $this->validDue;
+    }
+
+    public function setValidDue(?DateTimeInterface $validDue): self
+    {
+        $this->validDue = $validDue;
+
+        return $this;
+    }
+    public function deactivate() {
+        $this->validDue = new DateTime();
+        $this->active = false;
     }
 }

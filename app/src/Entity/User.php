@@ -72,6 +72,23 @@ class User implements UserInterface
         $this->subscriptions = new ArrayCollection();
     }
     /**
+     * @return Id
+     */
+    public function getId():Id {
+        return $this->id;
+    }
+
+
+    /**
+     * @return string
+     */
+    #[Pure] public function getIdAsString():string {
+        return $this->id->getValue();
+    }
+
+
+
+    /**
      * @return Email
      */
     public function getEmail():Email {
