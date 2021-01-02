@@ -59,6 +59,16 @@ services:
             - composer:/root/.composer/cache
             - ./app:/app
         logging: *default-logging
+    rabbitmq:
+        container_name: evaluate_app_rabbitmq
+        image: rabbitmq:management
+        hostname: rabbitmq
+        ports:
+            - "${RABBIT_PORT_SERVER}:5672"
+            - "${RABBIT_PORT_UI}:15672"
+
+        volumes:
+            - ./rabbitmq:/var/lib/rabbitmq:cached
 
 volumes:
     composer:
