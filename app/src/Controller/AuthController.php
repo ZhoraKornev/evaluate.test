@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Security\JwtAuthenticator;
+use DateTime;
 use Firebase\JWT\JWT;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +15,7 @@ class AuthController extends AbstractController
     public function login() {
         $payload = [
             "user" => $this->getUser()->getUsername(),
-            "exp" => (new \DateTime())->modify("+5 minutes")->getTimestamp(),
+            "exp" => (new DateTime())->modify(JwtAuthenticator::DEFAULT_LIFETIME_JWT)->getTimestamp(),
         ];
 
         $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');

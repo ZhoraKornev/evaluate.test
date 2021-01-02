@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table (name="subscription_types")
- * @ORM\Entity(repositoryClass=SubscriptionTypeRepository::class)
+ * @ORM\Entity(repositoryClass=SubscriptionTypeRepository::class,readOnly=true)
  * @ORM\HasLifecycleCallbacks()
  */
 class SubscriptionType

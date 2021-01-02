@@ -69,6 +69,9 @@ class LoginUserAuthenticator extends AbstractGuardAuthenticator
     }
 
     public function start(Request $request, AuthenticationException $authException = null) {
+        return new JsonResponse([
+            'result' => true
+        ]);
     }
 
     public function supportsRememberMe() {

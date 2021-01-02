@@ -2,8 +2,8 @@
 
 namespace App\Security;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
+use Exception;
 use Firebase\JWT\JWT;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,11 +18,11 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 class JwtAuthenticator extends AbstractGuardAuthenticator
 {
     public const DEFAULT_LIFETIME_JWT = '+50 minutes';
-    private $em;
-    private $params;
+    private UserRepository $users;
+    private ContainerBagInterface $params;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params) {
-        $this->em = $em;
+    public function __construct(UserRepository $userRepository, ContainerBagInterface $params) {
+        $this->users = $userRepository;
         $this->params = $params;
     }
 
@@ -50,17 +50,16 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
                 ['HS256']
             );
 
-            return $this->em->getRepository(User::class)
-                ->findOneBy([
-                    'email' => $jwt['user'],
-                ]);
-        } catch (\Exception $exception) {
+            return $this->users->findOneBy([
+                'email' => $jwt['user'],
+            ]);
+        } catch (Exception $exception) {
             throw new AuthenticationException($exception->getMessage());
         }
     }
 
     public function checkCredentials($credentials, UserInterface $user) {
-
+        return true;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {

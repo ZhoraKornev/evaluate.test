@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Table(name="user_users")
- * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\Entity(repositoryClass=UserRepository::class,readOnly=true)
  * @ORM\Table(name="user_users", uniqueConstraints={
  *     @ORM\UniqueConstraint(columns={"email"}),
  * })
