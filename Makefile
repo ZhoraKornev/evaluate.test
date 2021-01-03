@@ -2,7 +2,7 @@
 
 include .env
 
-dc = docker-compose -p ${APP_NAME}
+dc = docker-compose
 
 web = web
 php = php
@@ -42,11 +42,14 @@ php_bash:
 db_bash:
 	$(dc) exec $(db) bash
 
-node_bash:
-	$(dc) exec $(node) bash
-
 restart:
 	$(dc) restart
 
 fixtures:
-	$(dc) run --rm $(php) php bin/console doctrine:fixtures:load --no-interaction
+	$(dc) exec -T $(php) php bin/console doctrine:fixtures:load --no-interaction
+
+cache-clear:
+	$(dc) exec -T $(php) php bin/console doctrine:cache:clear-metadata
+
+migrations:
+	$(dc) exec -T $(php) php bin/console doctrine:migrations:migrate --allow-no-migration --no-interaction;

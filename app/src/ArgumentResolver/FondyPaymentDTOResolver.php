@@ -49,7 +49,7 @@ class FondyPaymentDTOResolver implements ArgumentValueResolverInterface
      */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        return FondyPaymentDTO::class === $argument->getType() && preg_match('/^\/subscription\/pay/', $request->getPathInfo());
+        return FondyPaymentDTO::class === $argument->getType() && str_contains('/api/v1/subscription/pay', $request->getPathInfo());
     }
 
     /**
@@ -61,8 +61,14 @@ class FondyPaymentDTOResolver implements ArgumentValueResolverInterface
     {
         // @see https://docs.fondy.eu/en/docs/page/3/#chapter-2
         /** @var FondyPaymentDTO $dto */
-        $this->logger->info('FONDY PAYMENT START');
         $dto = $this->serializer->deserialize($request->getContent(), FondyPaymentDTO::class, 'json');
+        $this->logger->info(
+            'FONDY PAYMENT START',
+            [
+                'status' => $dto->response_status,
+                'order_status' => $dto->order_status,
+                'response_description' => $dto->response_description,
+            ]);
         if (!$this->signatureVerifications->verify($dto)){
             $this->logger->critical(
                 'FONDY PAYMENT Signature invalid',

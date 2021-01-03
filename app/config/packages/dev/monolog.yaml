@@ -7,7 +7,7 @@ monolog:
             channels: ["!event"]
         subscription_logger:
             type: rotating_file
-            path: '%kernel.logs_dir%/subscription_log.log'
+            path:  "php://stderr"
             level: debug
             channels: [ 'subscription_logger' ]
             max_files: 10
