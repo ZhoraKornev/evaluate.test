@@ -83,11 +83,6 @@ class SubscriptionUser
         return $this;
     }
 
-    public function activate() {
-        $this->activateAt = new DateTime();
-        $this->active = true;
-    }
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -120,4 +115,11 @@ class SubscriptionUser
         $this->validDue = new DateTime();
         $this->active = false;
     }
+    /**
+     * @param DateTimeInterface|null $activateAt
+     */
+    public function setActivateAt(?DateTimeInterface $activateAt):void {
+        $this->activateAt = $activateAt;
+    }
+
 }

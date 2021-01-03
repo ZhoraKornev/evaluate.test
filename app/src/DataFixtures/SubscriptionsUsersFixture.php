@@ -6,6 +6,7 @@ use App\Entity\SubscriptionType;
 use App\Entity\User;
 use App\Exception\ReferenceNotFoundException;
 use App\Service\Factory\UserSubscriptionsCreator;
+use DateTime;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
@@ -15,7 +16,7 @@ class SubscriptionsUsersFixture extends CoreFixture implements DependentFixtureI
     /**
      * @var UserSubscriptionsCreator
      */
-    private UserSubscriptionsCreator $subscriptionsManager;
+    private UserSubscriptionsCreator $subscriptionsFactory;
 
     /**
      * SubscriptionsUsersFixture constructor.
@@ -23,7 +24,7 @@ class SubscriptionsUsersFixture extends CoreFixture implements DependentFixtureI
      * @param UserSubscriptionsCreator $userSubscriptionsManager
      */
     public function __construct(UserSubscriptionsCreator $userSubscriptionsManager) {
-        $this->subscriptionsManager =$userSubscriptionsManager;
+        $this->subscriptionsFactory =$userSubscriptionsManager;
     }
 
 
@@ -44,8 +45,9 @@ class SubscriptionsUsersFixture extends CoreFixture implements DependentFixtureI
             $subscriptionType = $this->getRandomReference(
                 SubscriptionType::class
             );
-            $entity = $this->subscriptionsManager->createForUser($user, $subscriptionType);
-            $entity->activate();
+            $entity = $this->subscriptionsFactory->createForUser($user, $subscriptionType);
+            $entity->setActive(true);
+            $entity->setActivateAt($this->faker->dateTimeBetween('-1 years','now'));
             $manager->persist($entity);
         }
         $manager->flush();

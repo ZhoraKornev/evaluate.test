@@ -6,7 +6,9 @@ use App\DTO\FondyPaymentDTO;
 use App\DTO\NewSubscriptionRequestDTO;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
-use App\Service\UserSubscriptionService;
+use App\Service\UserSubscriptionPaymentService;
+use Doctrine\ORM\EntityNotFoundException;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,17 +24,17 @@ class SubscriptionV1Controller extends AbstractController
      */
     private SubscriptionTypeRepository $subscriptions;
     /**
-     * @var UserSubscriptionService
+     * @var UserSubscriptionPaymentService
      */
-    private UserSubscriptionService $userSubscriptionService;
+    private UserSubscriptionPaymentService $userSubscriptionService;
 
     /**
      * SubscriptionController constructor.
      *
-     * @param SubscriptionTypeRepository $subscriptionTypeRepository
-     * @param UserSubscriptionService    $userSubscriptionService
+     * @param SubscriptionTypeRepository     $subscriptionTypeRepository
+     * @param UserSubscriptionPaymentService $userSubscriptionService
      */
-    public function __construct(SubscriptionTypeRepository $subscriptionTypeRepository,UserSubscriptionService $userSubscriptionService) {
+    public function __construct(SubscriptionTypeRepository $subscriptionTypeRepository,UserSubscriptionPaymentService $userSubscriptionService) {
         $this->subscriptions = $subscriptionTypeRepository;
         $this->userSubscriptionService = $userSubscriptionService;
 
@@ -54,7 +56,6 @@ class SubscriptionV1Controller extends AbstractController
         FondyPaymentDTO $paymentDTO
     ):Response
     {
-        $this->userSubscriptionService->payUserSubscription($paymentDTO);
         return $this->json([
             'result' => $this->userSubscriptionService->payUserSubscription($paymentDTO),
         ]);
@@ -63,15 +64,18 @@ class SubscriptionV1Controller extends AbstractController
     #[Route('/new', name:'api_new_subscription', methods:['PATCH'])]
     public function newSubscription(
         NewSubscriptionRequestDTO $requestDTO,
-        UserSubscriptionService $service
-    )
-    :Response {
-        $service->create($requestDTO);
-
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ApiController.php',
-        ]);
+        UserSubscriptionPaymentService $service
+    ):Response {
+        try {
+            return $this->json([
+                'status' => 'OK',
+                'order_id' => $service->createOrder($requestDTO),
+            ], Response::HTTP_OK);
+        } catch (EntityNotFoundException| LogicException $e) {
+            return $this->json([
+                'status' => 'fail',
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     #[Route('/user', name:'api_user_subscriptions', methods:['GET'])]
@@ -79,7 +83,7 @@ class SubscriptionV1Controller extends AbstractController
         SubscriptionUserRepository $userSubscriptions
     ):Response {
         return $this->json(
-            $userSubscriptions->findBy(['user' => $this->getUser()]),
+            ['user' => $this->getUser(),'subscriptions' =>$userSubscriptions->findBy(['user' => $this->getUser()])],
             Response::HTTP_OK,
             [],
             [
@@ -89,6 +93,7 @@ class SubscriptionV1Controller extends AbstractController
                     'createdAt',
                     'activateAt',
                     'id',
+                    'email',
                     'subscription' => ['name', 'contents' => ['name', 'description']]
                 ]
             ]);

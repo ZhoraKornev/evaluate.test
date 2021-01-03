@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,12 +21,20 @@ class LoginUserAuthenticator extends AbstractGuardAuthenticator
      * @var UserPasswordEncoderInterface
      */
     private UserPasswordEncoderInterface $passwordValidator;
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     /**
      * LoginUserAuthenticator constructor.
+     *
+     * @param UserPasswordEncoderInterface $encoder
+     * @param LoggerInterface              $logger
      */
-    public function __construct(UserPasswordEncoderInterface $encoder) {
+    public function __construct(UserPasswordEncoderInterface $encoder,LoggerInterface $logger) {
         $this->passwordValidator = $encoder;
+        $this->logger = $logger;
     }
     public function supports(Request $request) {
         return 'login' === $request->attributes->get('_route')
@@ -60,8 +69,10 @@ class LoginUserAuthenticator extends AbstractGuardAuthenticator
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {
+        $this->logger->warning('AUTH FAIL',
+            ['code' => $exception->getCode(), 'message' => $exception->getMessage()]);
         return new JsonResponse([
-            'message' => $exception->getMessage()
+            'message' => 'Incorrect data'
         ], Response::HTTP_UNAUTHORIZED);
     }
 
@@ -70,7 +81,7 @@ class LoginUserAuthenticator extends AbstractGuardAuthenticator
 
     public function start(Request $request, AuthenticationException $authException = null) {
         return new JsonResponse([
-            'result' => true
+            'message' => 'Authentication Required'
         ]);
     }
 
