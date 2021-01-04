@@ -7,6 +7,7 @@ use App\Repository\SubscriptionUserRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 
 /**
  * @ORM\Table (name="subscription_users")
@@ -64,6 +65,21 @@ class SubscriptionUser
         $this->user = $user;
         $this->active = false;
     }
+    /**
+     * @return Id
+     */
+    public function getId():Id {
+        return $this->id;
+    }
+
+
+    /**
+     * @return string
+     */
+    #[Pure] public function getIdAsString():string {
+        return $this->id->getValue();
+    }
+
 
 
     public function getActivateAt(): ?DateTimeInterface

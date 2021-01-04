@@ -55,6 +55,10 @@ class UserSubscriptionPaymentService
      * @var StateMachineFactory
      */
     private StateMachineFactory $stateFactory;
+    /**
+     * @var UserUnsubscribeService
+     */
+    private UserUnsubscribeService $delayedUnsubscribeService;
 
     /**
      * UserSubscriptionService constructor.
@@ -68,6 +72,7 @@ class UserSubscriptionPaymentService
      * @param PaymentSender              $paymentSender
      * @param LoggerInterface            $subscriptionLogger
      * @param StateMachineFactory        $stateFactory
+     * @param UserUnsubscribeService     $unsubscribeService
      */
     public function __construct(
         SubscriptionUserRepository $subscriptionUserRepository,
@@ -78,7 +83,8 @@ class UserSubscriptionPaymentService
         PaymentCreatorInterface $paymentCreator,
         PaymentSender $paymentSender,
         LoggerInterface $subscriptionLogger,
-        StateMachineFactory $stateFactory
+        StateMachineFactory $stateFactory,
+        UserUnsubscribeService $unsubscribeService
     ) {
         $this->usersSubscriptions = $subscriptionUserRepository;
         $this->entityManager = $entityManager;
@@ -89,6 +95,7 @@ class UserSubscriptionPaymentService
         $this->paymentSender = $paymentSender;
         $this->logger = $subscriptionLogger;
         $this->stateFactory = $stateFactory;
+        $this->delayedUnsubscribeService = $unsubscribeService;
     }
 
 
@@ -144,6 +151,7 @@ class UserSubscriptionPaymentService
         $this->entityManager->persist($subscription);
 
         $this->deactivateAllUsersPlans($this->users->find($this->resolveUserIdFromOrderId($paymentDTO->order_id)));
+        $this->delayedUnsubscribeService->unsubscribeUserWhenSubscriptionEnds($subscription);
         $this->entityManager->flush();
         return true;
     }
