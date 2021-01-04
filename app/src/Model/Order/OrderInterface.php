@@ -1,7 +1,6 @@
 <?php
 
-
-namespace App\Model;
+namespace App\Model\Order;
 
 
 interface OrderInterface

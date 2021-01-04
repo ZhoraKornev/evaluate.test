@@ -2,6 +2,8 @@
 
 namespace App\Exception;
 
-class ReferenceNotFoundException extends \Exception
+use Exception;
+
+class ReferenceNotFoundException extends Exception
 {
 }

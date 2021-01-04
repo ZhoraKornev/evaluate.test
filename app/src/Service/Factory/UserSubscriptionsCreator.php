@@ -19,8 +19,6 @@ class UserSubscriptionsCreator
      * @return SubscriptionUser
      */
     public function createForUser(User $user, SubscriptionType $subscriptionType):SubscriptionUser {
-        $entity = new SubscriptionUser(Id::next(), $subscriptionType, $user);
-        $entity->setValidDue((new DateTime())->modify("+{$subscriptionType->getPeriod()} days"));
-        return $entity;
+        return new SubscriptionUser(Id::next(), $subscriptionType, $user);
     }
 }

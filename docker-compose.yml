@@ -50,6 +50,8 @@ services:
         image: php-8
         container_name: evaluate_app_php
         restart: unless-stopped
+        depends_on:
+            - db
         env_file:
             - ./.env
         volumes:

@@ -3,7 +3,8 @@
 
 namespace App\Service;
 
-use App\Model\Order;
+
+use App\Model\Order\Order;
 
 class PaymentSender
 {

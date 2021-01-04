@@ -5,7 +5,7 @@ namespace App\Service;
 
 
 use App\DTO\NewSubscriptionRequestDTO;
-use App\Model\OrderInterface;
+use App\Model\Order\OrderInterface;
 
 interface PaymentCreatorInterface
 {

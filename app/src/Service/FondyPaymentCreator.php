@@ -5,7 +5,7 @@ namespace App\Service;
 
 
 use App\DTO\NewSubscriptionRequestDTO;
-use App\Model\Order;
+use App\Model\Order\Order;
 use JetBrains\PhpStorm\Pure;
 
 class FondyPaymentCreator implements PaymentCreatorInterface

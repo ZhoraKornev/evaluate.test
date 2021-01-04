@@ -4,13 +4,14 @@ namespace App\Service;
 
 use App\DTO\FondyPaymentDTO;
 use App\DTO\NewSubscriptionRequestDTO;
-use App\DTO\NewUserSubscriptionDTO;
 use App\Entity\SubscriptionUser;
 use App\Entity\User;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
 use App\Repository\UserRepository;
+use App\Service\Factory\StateMachineFactory;
 use App\Service\Factory\UserSubscriptionsCreator;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use LogicException;
@@ -41,7 +42,7 @@ class UserSubscriptionPaymentService
     /**
      * @var FondyPaymentCreator
      */
-    private FondyPaymentCreator $paymentCreator;
+    private PaymentCreatorInterface $paymentCreator;
     /**
      * @var PaymentSender
      */
@@ -50,6 +51,10 @@ class UserSubscriptionPaymentService
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
+    /**
+     * @var StateMachineFactory
+     */
+    private StateMachineFactory $stateFactory;
 
     /**
      * UserSubscriptionService constructor.
@@ -62,6 +67,7 @@ class UserSubscriptionPaymentService
      * @param PaymentCreatorInterface    $paymentCreator
      * @param PaymentSender              $paymentSender
      * @param LoggerInterface            $subscriptionLogger
+     * @param StateMachineFactory        $stateFactory
      */
     public function __construct(
         SubscriptionUserRepository $subscriptionUserRepository,
@@ -71,7 +77,8 @@ class UserSubscriptionPaymentService
         UserRepository $userRepository,
         PaymentCreatorInterface $paymentCreator,
         PaymentSender $paymentSender,
-        LoggerInterface $subscriptionLogger
+        LoggerInterface $subscriptionLogger,
+        StateMachineFactory $stateFactory
     ) {
         $this->usersSubscriptions = $subscriptionUserRepository;
         $this->entityManager = $entityManager;
@@ -81,6 +88,7 @@ class UserSubscriptionPaymentService
         $this->paymentCreator = $paymentCreator;
         $this->paymentSender = $paymentSender;
         $this->logger = $subscriptionLogger;
+        $this->stateFactory = $stateFactory;
     }
 
 
@@ -118,38 +126,65 @@ class UserSubscriptionPaymentService
         return $order->getOrderId();
     }
 
-    public function payUserSubscription(FondyPaymentDTO $paymentDTO) {
-        //TODO validate order data
+    /**
+     * @param FondyPaymentDTO $paymentDTO
+     *
+     * @return bool
+     * @throws EntityNotFoundException
+     */
+    public function payUserSubscription(FondyPaymentDTO $paymentDTO):bool
+    {
         if (!$paymentDTO->order_status){
+            $this->logger->critical('SUBSCRIPTION LOG payment status data is empty');
             return false;
         }
-        $newSubscription = $this->getNewUserSubscriptionByOrderId($paymentDTO->order_id);
-        if ($this->usersSubscriptions->count(['user' => $newSubscription->user, 'active' => true])){
-            $this->deactivateAllUsersPlans($newSubscription->user);
-        }
-        $newUserSubscription = $this->userSubscriptionsManager->createForUser(
-            $newSubscription->user,
-            $newSubscription->subscription
-        );
-        $this->entityManager->persist($newUserSubscription);
-        $this->entityManager->flush();
+        $subscription = $this->getUserSubscriptionByOrderId($paymentDTO->order_id);
+        $statusMachine =  $this->stateFactory->resolveMachine($subscription);
+        $statusMachine->proceedToNext();
+        $this->entityManager->persist($subscription);
 
+        $this->deactivateAllUsersPlans($this->users->find($this->resolveUserIdFromOrderId($paymentDTO->order_id)));
+        $this->entityManager->flush();
         return true;
     }
 
-    private function getNewUserSubscriptionByOrderId(string $orderId) {
-        //TODO resolve order id user_id|subscription_id and get correct data
-        $newUserSubscription = new NewUserSubscriptionDTO();
-        $newUserSubscription->user = current($this->users->findAll());
-        $newUserSubscription->subscription = current($this->subscriptionPlans->findAll());
+    /**
+     * @param string $orderId
+     *
+     * @return SubscriptionUser|null
+     * @throws EntityNotFoundException
+     */
+    private function getUserSubscriptionByOrderId(string $orderId) {
 
-        return $newUserSubscription;
+        if (!$userSubscription = $this->usersSubscriptions->findOneBy([
+            'user' => $this->resolveUserIdFromOrderId($orderId),
+            'subscription' => $this->resolveSubscriptionIdFromOrderId($orderId),
+            'active' => false,
+            'activateAt' => null
+        ])) {
+            $this->logger->warning('SUBSCRIPTION LOG RECEIVE payment for non existing order', ['order_id' => $orderId]);
+            throw new EntityNotFoundException('Users does not have orders');
+        }
+        return $userSubscription;
     }
 
     private function deactivateAllUsersPlans(User $user){
         array_map(function (SubscriptionUser $subscriptionUser){
             $subscriptionUser->deactivate();
             $this->entityManager->persist($subscriptionUser);
-        },$this->usersSubscriptions->findBy(['user' => $user]));
+        }, $this->usersSubscriptions->findBy(['user' => $user, 'active' => true]));
+    }
+
+    private function resolveUserIdFromOrderId(string $orderId) {
+        //order_id = user_id|subscription_id
+        $tmp = explode('|', $orderId);
+
+        return $tmp[0];
+    }
+    private function resolveSubscriptionIdFromOrderId(string $orderId) {
+        //order_id = user_id|subscription_id
+        $tmp = explode('|', $orderId);
+
+        return $tmp[1];
     }
 }

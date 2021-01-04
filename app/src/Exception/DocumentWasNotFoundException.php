@@ -2,6 +2,8 @@
 
 namespace App\Exception;
 
-class DocumentWasNotFoundException extends \Exception
+use Exception;
+
+class DocumentWasNotFoundException extends Exception
 {
 }
