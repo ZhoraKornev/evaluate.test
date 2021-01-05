@@ -15,31 +15,39 @@ class StateMachineFactoryTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider testSuccessDataProvider
+     * @dataProvider testActiveDataProvider
      *
      * @param mixed $randomValue
      */
-    public function testSuccessCreation(bool|int|string $randomValue): void {
+    public function testActiveCreation(bool|int|string $randomValue): void {
         $subscriptionMock = $this->getMockBuilder(SubscriptionUser::class)->disableOriginalConstructor()->getMock();;
         $subscriptionMock->expects($this->atLeastOnce())->method('getActive')->willReturn($randomValue);
         $service = new StateMachineFactory();
         $newSubscriptionUserStatusMachine = $service->resolveMachine($subscriptionMock);
         $this->assertInstanceOf(SubscriptionUserStatusMachine::class, $newSubscriptionUserStatusMachine);
-
-//        if ($type->getActive()) {
-//            $machine = new SubscriptionUserStatusMachine(new ActiveState());
-//            $machine->setSubscriptionUser($type);
-//            return $machine;
-//        }
-//        $machine = new SubscriptionUserStatusMachine(new NonActiveState());
-//        $machine->setSubscriptionUser($type);
-//
-//        return $machine;
-
-        $this->assertTrue(true);
+        $this->assertInstanceOf(ActiveState::class, $newSubscriptionUserStatusMachine->setState());
     }
 
-    public function testSuccessDataProvider() {
-        return [true, false, true, 1, 0, 10, 'test'];
+    /**
+     * @test
+     * @dataProvider testNonActiveDataProvider
+     *
+     * @param mixed $randomValue
+     */
+    public function testNonActiveCreation(bool|int|string $randomValue): void {
+        $subscriptionMock = $this->getMockBuilder(SubscriptionUser::class)->disableOriginalConstructor()->getMock();;
+        $subscriptionMock->expects($this->atLeastOnce())->method('getActive')->willReturn($randomValue);
+        $service = new StateMachineFactory();
+        $newSubscriptionUserStatusMachine = $service->resolveMachine($subscriptionMock);
+        $this->assertInstanceOf(SubscriptionUserStatusMachine::class, $newSubscriptionUserStatusMachine);
+        $this->assertInstanceOf(NonActiveState::class, $newSubscriptionUserStatusMachine->setState());
+    }
+
+    public function testActiveDataProvider() {
+        return [true, true, true, 1, 10, 'test'];
+    }
+
+    public function testNonActiveDataProvider() {
+        return [false, false, false, 0, 00, 0];
     }
 }
