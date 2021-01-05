@@ -30,6 +30,7 @@ class SubscriptionUser
      */
     private ?DateTimeInterface $activateAt;
 
+    //при оформлении подписки через систему заказов переделать свойство под модель status и уже через StateMachine переводить из статуса в статус
     /**
      * @ORM\Column(type="boolean")
      */
