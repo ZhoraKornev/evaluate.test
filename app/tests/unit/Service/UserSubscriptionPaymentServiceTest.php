@@ -3,10 +3,11 @@
 namespace App\Tests\unit\Service;
 
 use App\DTO\FondyPaymentDTO;
+use App\DTO\NewSubscriptionRequestDTO;
+use App\Entity\SubscriptionType;
 use App\Entity\SubscriptionUser;
 use App\Entity\User;
-use App\Model\Order\State\ActiveState;
-use App\Model\Order\State\NonActiveState;
+use App\Model\Order\Order;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
 use App\Repository\UserRepository;
@@ -18,9 +19,10 @@ use App\Service\SubscriptionUserStatusMachine;
 use App\Service\UserSubscriptionPaymentService;
 use App\Service\UserUnsubscribeService;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use JetBrains\PhpStorm\Pure;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use LogicException;
 use Codeception\Test\Unit;
 use Psr\Log\LoggerInterface;
 
@@ -103,6 +105,10 @@ class UserSubscriptionPaymentServiceTest  extends Unit
 
     }
 
+    /**
+     * @test
+     * @throws EntityNotFoundException
+     */
     public function testPayUserSubscriptionSuccess()
     {
         $subscriptionUserMock = $this->createMock(SubscriptionUser::class);
@@ -118,7 +124,65 @@ class UserSubscriptionPaymentServiceTest  extends Unit
         $this->userUnsubscribeServiceMock->expects($this->atLeastOnce())->method('unsubscribeUserWhenSubscriptionEnds')->with($subscriptionUserMock);
         $this->entityManagerInterfaceMock->expects($this->atLeastOnce())->method('flush');
 
-        $this->service->payUserSubscription($this->paymentDTO);
+        $this->assertTrue($this->service->payUserSubscription($this->paymentDTO));
+    }
+
+    /**
+     * @test
+     */
+    public function testPayUserSubscriptionFailWithOutOrderStatus()
+    {
+        $this->paymentDTO->order_status = "";
+
+        $this->assertFalse($this->service->payUserSubscription($this->paymentDTO));
+    }
+
+
+
+    public function testCreateOrderSuccess() {
+        $dto = new NewSubscriptionRequestDTO();
+        $dto->user = $this->createMock(User::class);
+        $dto->subscription_id = '123';
+        $this->subscriptionTypeRepositoryMock->expects($this->atLeastOnce())->method('count')->with(['id' => $dto->subscription_id])->willReturn(1);
+        $this->subscriptionUserRepositoryMock->expects($this->atLeastOnce())->method('count')->with(
+            [
+                'user' => $dto->user,
+                'subscription' => $dto->subscription_id,
+                'active' => false,
+                'activateAt' => null
+            ]
+
+        )->willReturn(0);
+        $orderMock = $this->createMock(Order::class);
+        $this->paymentCreatorInterfaceMock->expects($this->atLeastOnce())->method('create')->willReturn($orderMock);
+        $this->paymentSenderMock->expects($this->atLeastOnce())->method('sendToPaymentGateway')->with($orderMock);
+        $subscriptionUserMock = $this->createMock(SubscriptionUser::class);
+        $subscriptionTypeMock = $this->createMock(SubscriptionType::class);
+        $this->subscriptionTypeRepositoryMock->expects($this->atLeastOnce())->method('findOneBy')->with(['id' => $dto->subscription_id])->willReturn($subscriptionTypeMock);
+        $this->userSubscriptionsCreatorMock->expects($this->atLeastOnce())->method('createForUser')->with($dto->user,$subscriptionTypeMock)->willReturn($subscriptionUserMock);
+        $this->entityManagerInterfaceMock->expects($this->atLeastOnce())->method('persist')->with($subscriptionUserMock);
+        $this->entityManagerInterfaceMock->expects($this->atLeastOnce())->method('flush');
+
+        $this->service->createOrder($dto);
+    }
+
+    public function testCreateOrderFail() {
+        $dto = new NewSubscriptionRequestDTO();
+        $dto->user = $this->createMock(User::class);
+        $dto->subscription_id = '123';
+        $this->subscriptionTypeRepositoryMock->expects($this->atLeastOnce())->method('count')->with(['id' => $dto->subscription_id])->willReturn(1);
+        $this->subscriptionUserRepositoryMock->expects($this->atLeastOnce())->method('count')->with(
+            [
+                'user' => $dto->user,
+                'subscription' => $dto->subscription_id,
+                'active' => false,
+                'activateAt' => null
+            ]
+
+        )->willReturn(1);
+        $this->expectException(LogicException::class);
+
+        $this->service->createOrder($dto);
     }
 
     /**
@@ -146,18 +210,4 @@ class UserSubscriptionPaymentServiceTest  extends Unit
         return $paymentDTO;
 
     }
-    public function testPayUserSubscriptionFail()
-    {
-        $this->assertTrue(true);
-    }
-
-    public function testCreateOrderSuccess() {
-        $this->assertTrue(true);
-    }
-
-    public function testCreateOrderFail() {
-        $this->assertTrue(true);
-
-    }
-
 }
