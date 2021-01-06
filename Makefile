@@ -55,7 +55,7 @@ migrations:
 	$(dc) exec -T $(php) php bin/console doctrine:migrations:migrate --allow-no-migration --no-interaction;
 
 tests:
-	$(dc) exec -T $(php) php bin/phpunit;
+	$(dc) exec -T $(php) php vendor/bin/codecept run;
 
 linter-run:
 	$(dc) exec -T $(php) php ./vendor/bin/phplint ./ --exclude=vendor;
