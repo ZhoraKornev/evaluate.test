@@ -56,3 +56,6 @@ migrations:
 
 tests:
 	$(dc) exec -T $(php) php bin/phpunit;
+
+linter-run:
+	$(dc) exec -T $(php) php ./vendor/bin/phplint ./ --exclude=vendor;

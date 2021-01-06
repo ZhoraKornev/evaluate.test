@@ -26,8 +26,14 @@
     "monolog/monolog": {
         "version": "2.2.0"
     },
+    "n98/junit-xml": {
+        "version": "1.0.0"
+    },
     "nikic/php-parser": {
         "version": "v4.10.4"
+    },
+    "overtrue/phplint": {
+        "version": "2.3.5"
     },
     "php": {
         "version": "7.4"
@@ -225,6 +231,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.20.0"
+    },
+    "symfony/process": {
+        "version": "v5.2.1"
     },
     "symfony/property-access": {
         "version": "v5.2.1"
