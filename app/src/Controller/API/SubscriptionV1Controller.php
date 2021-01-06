@@ -68,13 +68,12 @@ class SubscriptionV1Controller extends AbstractController
 
     #[Route('/new', name:'api_new_subscription', methods:['PATCH'])]
     public function newSubscription(
-        NewSubscriptionRequestDTO $requestDTO,
-        UserSubscriptionPaymentService $service
+        NewSubscriptionRequestDTO $requestDTO
     ):Response {
         try {
             return $this->json([
                 'status' => 'OK',
-                'order_id' => $service->createOrder($requestDTO),
+                'order_id' => $this->userSubscriptionService->createOrder($requestDTO),
             ], Response::HTTP_OK);
         } catch (EntityNotFoundException| LogicException $e) {
             return $this->json([
