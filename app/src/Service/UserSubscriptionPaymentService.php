@@ -11,7 +11,6 @@ use App\Repository\SubscriptionUserRepository;
 use App\Repository\UserRepository;
 use App\Service\Factory\StateMachineFactory;
 use App\Service\Factory\UserSubscriptionsCreator;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use LogicException;
@@ -162,7 +161,7 @@ class UserSubscriptionPaymentService
      * @return SubscriptionUser|null
      * @throws EntityNotFoundException
      */
-    private function getUserSubscriptionByOrderId(string $orderId) {
+    private function getUserSubscriptionByOrderId(string $orderId):?SubscriptionUser {
 
         if (!$userSubscription = $this->usersSubscriptions->findOneBy([
             'user' => $this->resolveUserIdFromOrderId($orderId),

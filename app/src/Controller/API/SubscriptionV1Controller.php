@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Doctrine\ORM\EntityNotFoundException as ORMEntityNotFoundException;
 
 /**
  * @Route("/api/v1/subscription", name="api_v1")
@@ -54,12 +55,11 @@ class SubscriptionV1Controller extends AbstractController
     #[Route('/pay', name:'confirm_subscription', methods:['POST'])]
     public function pay(FondyPaymentDTO $paymentDTO):Response
     {
-        $this->userSubscriptionService->payUserSubscription($paymentDTO);
         try {
             return $this->json([
                 'result' => $this->userSubscriptionService->payUserSubscription($paymentDTO),
             ], Response::HTTP_OK);
-        } catch (EntityNotFoundException| LogicException $e) {
+        } catch (LogicException | ORMEntityNotFoundException $e) {
             return $this->json([
                 'status' => false,
             ], Response::HTTP_BAD_REQUEST);
