@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\DTO\FondyPaymentDTO;
 use App\DTO\NewSubscriptionRequestDTO;
 use App\Entity\SubscriptionType;
+use App\Repository\ContentRepository;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
 use App\Service\UserSubscriptionPaymentService;
@@ -126,15 +127,17 @@ class SubscriptionV1Controller extends AbstractController
     #[Route('/user/current', name:'api_user_subscriptions_active', methods:['GET'])]
     public function userSubscriptionsActive(
         SubscriptionUserRepository $userSubscriptions,
+        ContentRepository $contentRepository,
         Request $request,
         PaginatorInterface $paginator
     ):Response {
-        $query = $userSubscriptions->createQueryBuilder('us')->getQuery();
+        $subscription = $userSubscriptions->findOneBy(['user' => $this->getUser(),'active'=> true]);
+        $query = $contentRepository->createQueryBuilderForPagination($subscription->getSubscription());
 
         return $this->json(
             [
                 'user' => $this->getUser(),
-                'subscriptions' => $paginator->paginate(
+                'content' => $paginator->paginate(
                     $query,
                     $request->query->getInt('page', 1),
                     $request->query->getInt('itemsPerPage', 1)
