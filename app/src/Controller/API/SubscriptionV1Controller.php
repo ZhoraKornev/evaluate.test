@@ -9,8 +9,10 @@ use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
 use App\Service\UserSubscriptionPaymentService;
 use Doctrine\ORM\EntityNotFoundException;
+use Knp\Component\Pager\PaginatorInterface;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -120,24 +122,31 @@ class SubscriptionV1Controller extends AbstractController
                 ]
             ]);
     }
-
+    
     #[Route('/user/current', name:'api_user_subscriptions_active', methods:['GET'])]
     public function userSubscriptionsActive(
-        SubscriptionUserRepository $userSubscriptions
+        SubscriptionUserRepository $userSubscriptions,
+        Request $request,
+        PaginatorInterface $paginator
     ):Response {
+        $query = $userSubscriptions->createQueryBuilder('us')->getQuery();
+
         return $this->json(
-            ['user' => $this->getUser(),'subscriptions' =>$userSubscriptions->findBy(['user' => $this->getUser(),'active'=> true])],
+            [
+                'user' => $this->getUser(),
+                'subscriptions' => $paginator->paginate(
+                    $query,
+                    $request->query->getInt('page', 1),
+                    $request->query->getInt('itemsPerPage', 1)
+                )
+            ],
             Response::HTTP_OK,
             [],
             [
                 AbstractNormalizer::ATTRIBUTES => [
-                    'active',
                     'validDue',
-                    'createdAt',
                     'activateAt',
-                    'id',
-                    'email',
-                    'subscription' => ['name', 'contents' => ['name','description','year']]
+                    'subscription' => ['name', 'contents' => ['name', 'description', 'year']]
                 ]
             ]);
     }
