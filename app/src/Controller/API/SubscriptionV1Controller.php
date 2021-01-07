@@ -74,7 +74,7 @@ class SubscriptionV1Controller extends AbstractController
             return $this->json([
                 'status' => 'OK',
                 'order_id' => $this->userSubscriptionService->createOrder($requestDTO),
-            ], Response::HTTP_OK);
+            ], Response::HTTP_CREATED);
         } catch (EntityNotFoundException| LogicException $e) {
             return $this->json([
                 'status' => 'fail',
@@ -82,7 +82,7 @@ class SubscriptionV1Controller extends AbstractController
         }
     }
 
-    #[Route('/user', name:'api_user_subscriptions', methods:['GET'])]
+    #[Route('/user/all', name:'api_user_subscriptions_all', methods:['GET'])]
     public function userSubscriptions(
         SubscriptionUserRepository $userSubscriptions
     ):Response {
@@ -98,7 +98,28 @@ class SubscriptionV1Controller extends AbstractController
                     'activateAt',
                     'id',
                     'email',
-                    'subscription' => ['name', 'contents' => ['name', 'description']]
+                    'subscription' => ['name', 'contents' => ['name']]
+                ]
+            ]);
+    }
+
+    #[Route('/user/current', name:'api_user_subscriptions_active', methods:['GET'])]
+    public function userSubscriptionsActive(
+        SubscriptionUserRepository $userSubscriptions
+    ):Response {
+        return $this->json(
+            ['user' => $this->getUser(),'subscriptions' =>$userSubscriptions->findBy(['user' => $this->getUser(),'active'=> true])],
+            Response::HTTP_OK,
+            [],
+            [
+                AbstractNormalizer::ATTRIBUTES => [
+                    'active',
+                    'validDue',
+                    'createdAt',
+                    'activateAt',
+                    'id',
+                    'email',
+                    'subscription' => ['name', 'contents' => ['name','description','year']]
                 ]
             ]);
     }
