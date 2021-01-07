@@ -95,6 +95,12 @@
     "justinrainbow/json-schema": {
         "version": "5.2.10"
     },
+    "knplabs/knp-components": {
+        "version": "v3.0.0"
+    },
+    "knplabs/knp-paginator-bundle": {
+        "version": "v5.4.2"
+    },
     "monolog/monolog": {
         "version": "2.2.0"
     },
@@ -488,6 +494,22 @@
     "symfony/test-pack": {
         "version": "v1.0.7"
     },
+    "symfony/translation": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "2ad9d2545bce8ca1a863e50e92141f0b9d87ffcd"
+        },
+        "files": [
+            "config/packages/translation.yaml",
+            "translations/.gitignore"
+        ]
+    },
+    "symfony/translation-contracts": {
+        "version": "v2.3.0"
+    },
     "symfony/var-dumper": {
         "version": "v5.2.1"
     },
@@ -499,6 +521,9 @@
     },
     "theseer/tokenizer": {
         "version": "1.2.0"
+    },
+    "twig/twig": {
+        "version": "v3.2.1"
     },
     "webmozart/assert": {
         "version": "1.9.1"
