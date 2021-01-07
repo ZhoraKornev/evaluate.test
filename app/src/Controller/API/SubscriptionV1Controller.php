@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\DTO\FondyPaymentDTO;
 use App\DTO\NewSubscriptionRequestDTO;
+use App\Entity\SubscriptionType;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
 use App\Service\UserSubscriptionPaymentService;
@@ -14,6 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Doctrine\ORM\EntityNotFoundException as ORMEntityNotFoundException;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use Nelmio\ApiDocBundle\Annotation\Model;
 
 /**
  * @Route("/api/v1/subscription", name="api_v1")
@@ -40,7 +44,21 @@ class SubscriptionV1Controller extends AbstractController
         $this->userSubscriptionService = $userSubscriptionService;
 
     }
-
+    /**
+     * List the subscriptions.
+     *
+     * @Route("/api/v1/subscription", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns all awailable susbscription plans",
+     *     @SWG\Schema(
+     *         type="json",
+     *         @SWG\Items(ref=@Model(type=SubscriptionType::class, groups={"full"}))
+     *     )
+     * )
+     * @SWG\Tag(name="subscription")
+     * @Security(name="JWT")
+     */
     #[Route('/', name:'subscription_plan', methods:['GET'])]
     public function plans():Response
     {
