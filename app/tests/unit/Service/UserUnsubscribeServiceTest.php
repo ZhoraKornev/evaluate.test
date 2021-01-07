@@ -45,17 +45,6 @@ class UserUnsubscribeServiceTest extends Unit
         );
 
     }
-    /**
-     * @test
-     * @skip
-     * @throws \Exception
-     */
-    public function testUnsubscribeUserWhenSubscriptionEnds(){
-        $subscriptionTypeMock = $this->makeEmpty(SubscriptionType::class,['getPeriod' => 7,]);
-        $newUserSubscriptionsMock = $this->makeEmpty(SubscriptionUser::class,['getSubscription' => $subscriptionTypeMock]);
-        $this->messageBusMock->expects($this->atLeastOnce())->method('dispatch')->with($this->any());
-        $this->service->unsubscribeUserWhenSubscriptionEnds($newUserSubscriptionsMock);
-    }
 
     /**
      * @param string $contentId
