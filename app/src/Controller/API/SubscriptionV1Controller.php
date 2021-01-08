@@ -4,16 +4,23 @@ namespace App\Controller\API;
 
 use App\DTO\FondyPaymentDTO;
 use App\DTO\NewSubscriptionRequestDTO;
+use App\Entity\SubscriptionType;
+use App\Repository\ContentRepository;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
 use App\Service\UserSubscriptionPaymentService;
 use Doctrine\ORM\EntityNotFoundException;
+use Knp\Component\Pager\PaginatorInterface;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Doctrine\ORM\EntityNotFoundException as ORMEntityNotFoundException;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use Nelmio\ApiDocBundle\Annotation\Model;
 
 /**
  * @Route("/api/v1/subscription", name="api_v1")
@@ -40,7 +47,21 @@ class SubscriptionV1Controller extends AbstractController
         $this->userSubscriptionService = $userSubscriptionService;
 
     }
-
+    /**
+     * List the subscriptions.
+     *
+     * @Route("/api/v1/subscription", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns all awailable susbscription plans",
+     *     @SWG\Schema(
+     *         type="json",
+     *         @SWG\Items(ref=@Model(type=SubscriptionType::class, groups={"full"}))
+     *     )
+     * )
+     * @SWG\Tag(name="subscription")
+     * @Security(name="JWT")
+     */
     #[Route('/', name:'subscription_plan', methods:['GET'])]
     public function plans():Response
     {
@@ -102,24 +123,33 @@ class SubscriptionV1Controller extends AbstractController
                 ]
             ]);
     }
-
+    
     #[Route('/user/current', name:'api_user_subscriptions_active', methods:['GET'])]
     public function userSubscriptionsActive(
-        SubscriptionUserRepository $userSubscriptions
+        SubscriptionUserRepository $userSubscriptions,
+        ContentRepository $contentRepository,
+        Request $request,
+        PaginatorInterface $paginator
     ):Response {
+        $subscription = $userSubscriptions->findOneBy(['user' => $this->getUser(),'active'=> true]);
+        $query = $contentRepository->createQueryBuilderForPagination($subscription->getSubscription());
+
         return $this->json(
-            ['user' => $this->getUser(),'subscriptions' =>$userSubscriptions->findBy(['user' => $this->getUser(),'active'=> true])],
+            [
+                'user' => $this->getUser(),
+                'content' => $paginator->paginate(
+                    $query,
+                    $request->query->getInt('page', 1),
+                    $request->query->getInt('itemsPerPage', 1)
+                )
+            ],
             Response::HTTP_OK,
             [],
             [
                 AbstractNormalizer::ATTRIBUTES => [
-                    'active',
                     'validDue',
-                    'createdAt',
                     'activateAt',
-                    'id',
-                    'email',
-                    'subscription' => ['name', 'contents' => ['name','description','year']]
+                    'subscription' => ['name', 'contents' => ['name', 'description', 'year']]
                 ]
             ]);
     }
