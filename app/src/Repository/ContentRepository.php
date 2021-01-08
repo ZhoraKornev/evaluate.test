@@ -27,11 +27,10 @@ class ContentRepository extends ServiceEntityRepository
      * @return Query
      */
     public function createQueryBuilderForPagination(SubscriptionType $subscriptionType) {
-        return $this->createQueryBuilder('us')
-            ->innerJoin(SubscriptionType::class, 'st', Query\Expr\Join::ON)
-            ->where('st.id = :subscriptionTypeId')
-            ->setParameter('subscriptionTypeId', $subscriptionType->getId())
-
-            ->getQuery();
+        return
+            $this->createQueryBuilder('us')
+                ->innerJoin(SubscriptionType::class, 'st', 'WITH', 'st.id = :subid')
+                ->setParameter('subid', $subscriptionType->getId())
+                ->getQuery();
     }
 }

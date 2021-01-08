@@ -136,20 +136,19 @@ class SubscriptionV1Controller extends AbstractController
 
         return $this->json(
             [
-                'user' => $this->getUser(),
                 'content' => $paginator->paginate(
                     $query,
                     $request->query->getInt('page', 1),
                     $request->query->getInt('itemsPerPage', 1)
-                )
+                )->getItems()
             ],
             Response::HTTP_OK,
             [],
             [
                 AbstractNormalizer::ATTRIBUTES => [
-                    'validDue',
-                    'activateAt',
-                    'subscription' => ['name', 'contents' => ['name', 'description', 'year']]
+                    'name',
+                    'description',
+                    'year',
                 ]
             ]);
     }
