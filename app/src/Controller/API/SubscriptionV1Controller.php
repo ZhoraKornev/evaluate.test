@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\DTO\FondyPaymentDTO;
 use App\DTO\NewSubscriptionRequestDTO;
 use App\Entity\SubscriptionType;
+use App\Entity\Content;
 use App\Repository\ContentRepository;
 use App\Repository\SubscriptionTypeRepository;
 use App\Repository\SubscriptionUserRepository;
@@ -59,6 +60,7 @@ class SubscriptionV1Controller extends AbstractController
      *         @SWG\Items(ref=@Model(type=SubscriptionType::class, groups={"full"}))
      *     )
      * )
+     *
      * @SWG\Tag(name="subscription")
      * @Security(name="JWT")
      */
@@ -73,6 +75,21 @@ class SubscriptionV1Controller extends AbstractController
         );
     }
 
+    /**
+     * List the subscriptions.
+     *
+     * @Route("/api/v1/subscription/pay", methods={"POST"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns all awailable susbscription plans",
+     *     @SWG\Schema(
+     *        type="object",
+     *        example={"succes": "bool"}
+     *     )
+     * )
+     * @SWG\Tag(name="subscription")
+     * @Security(name="JWT")
+     */
     #[Route('/pay', name:'confirm_subscription', methods:['POST'])]
     public function pay(FondyPaymentDTO $paymentDTO):Response
     {
@@ -87,6 +104,21 @@ class SubscriptionV1Controller extends AbstractController
         }
     }
 
+    /**
+     * List the subscriptions.
+     *
+     * @Route("/api/v1/subscription/new", methods={"PATCH"})
+     * @SWG\Response(
+     *     response=201,
+     *     description="New susbscription for user",
+     *     @SWG\Schema(
+     *        type="json",
+     *        example={"orderId": "string"}
+     *     )
+     * )
+     * @SWG\Tag(name="subscription")
+     * @Security(name="JWT")
+     */
     #[Route('/new', name:'api_new_subscription', methods:['PATCH'])]
     public function newSubscription(
         NewSubscriptionRequestDTO $requestDTO
@@ -123,7 +155,34 @@ class SubscriptionV1Controller extends AbstractController
                 ]
             ]);
     }
-    
+
+    /**
+     * List of pre payment user susbscription.
+     *
+     * @Route("/api/v1/subscription/user/current", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="List of pre payment user susbscription",
+     *     @SWG\Schema(
+     *         type="json",
+     *         @SWG\Items(ref=@Model(type=Content::class, groups={"full"}))
+     *     )
+     * )
+     * @SWG\Parameter(
+     *     name="page",
+     *     in="query",
+     *     type="integer",
+     *     description="The field used for pagination"
+     * )
+     * @SWG\Tag(name="subscription")
+     * @Security(name="JWT")
+     * @param SubscriptionUserRepository $userSubscriptions
+     * @param ContentRepository          $contentRepository
+     * @param Request                    $request
+     * @param PaginatorInterface         $paginator
+     *
+     * @return Response
+     */
     #[Route('/user/current', name:'api_user_subscriptions_active', methods:['GET'])]
     public function userSubscriptionsActive(
         SubscriptionUserRepository $userSubscriptions,

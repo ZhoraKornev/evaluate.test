@@ -4,6 +4,15 @@ nelmio_api_doc:
             title: API susbsriptions
             description: This is an awesome app!
             version: 0.0.1
+        securityDefinitions:
+            JWT:
+                type: apiKey
+                description: 'Value: {jwt}'
+                name: Authorization
+                in: header
+                required:   true
+        security:
+            - JWT: [ ]
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
