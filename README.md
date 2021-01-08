@@ -1,7 +1,22 @@
 # evaluate.test 
 ### API
 This project present simple subscription service - we have plans with different tariffs 
-all plans contains multiply interest content.     
+all plans contains multiply interest content.
+
+### BUILD
+just run make build
+Then run make fixtures - and cope auth data from console for start work
+
+###SWAGGER
+presents in json 
+available at url http://your_domain/api/doc.json
+
+###TESTS
+only unit
+functional maybe later
+
+###MAIL
+- mailhog docker image already build in
 
 ####RESPONSE/REQUEST
 - all **RESPONSE** data represent in JSON data.
@@ -34,3 +49,4 @@ some non critical TODO
 - subscription_user status rebuild onto state machine pattern
 - extend payments system with polymorphic methods 
 - create a controller for admin
+- log all events to mailhog
