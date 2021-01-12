@@ -7,18 +7,18 @@ all plans contains multiply interest content.
 just run make build
 Then run make fixtures - and cope auth data from console for start work
 
-###SWAGGER
+### SWAGGER
 presents in json 
 available at url http://your_domain/api/doc.json
 
-###TESTS
+### TESTS
 only unit
 functional maybe later
 
-###MAIL
+### MAIL
 - mailhog docker image already build in
 
-####RESPONSE/REQUEST
+#### RESPONSE/REQUEST
 - all **RESPONSE** data represent in JSON data.
 
  - all **REQUEST** data should represent in JSON
@@ -27,7 +27,7 @@ functional maybe later
      - all secured link should receive headers with "Authorization" key and "JWT" as value
      - JWT generated after login. Lifetime JWT 50 minutes and then you relogin no refresh token allowed
 
-###SOME LOGIC
+### SOME LOGIC
 - HOME(unsecure) page represent all subscriptions plan and short welcome message to users
 - AUTH(unsecure) *auth/login* page await for form-data with POST method = email and password
 - PAY callback url(unsecure) *api/v1/subscription/pay* - waiting  for request form payment gateway
